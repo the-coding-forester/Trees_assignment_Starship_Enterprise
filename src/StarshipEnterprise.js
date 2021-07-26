@@ -54,8 +54,21 @@ class StarshipEnterprise {
     This method should return an array of officers who do not have direct reports.
     For example: [ "Lieutenant Security-Officer", "Lt. Cmdr. LaForge", "Lieutenant Selar" ]
     */
+    return this.endLeavesHelper(values)[1];
+  }
 
-    return values;
+  endLeavesHelper(values = [], noReport = []) {
+    if (this.leftReport) {
+      values = this.leftReport.endLeavesHelper(values, noReport)[0]
+    }
+    values.push(this);
+    if (this.rightReport) {
+      values = this.rightReport.endLeavesHelper(values, noReport)[0]
+    }
+    if (!this.leftReport && !this.rightReport) {
+      noReport.push(this.officerName);
+    }
+    return [values, noReport];
   }
 
   listOfficersByExperience(officerNames = []) {
@@ -64,8 +77,19 @@ class StarshipEnterprise {
     For example: [ "Lieutenant Selar", "Lt. Cmdr. Crusher", "Commander Data", "Captain Picard",
     "Lt. Cmdr. LaForge", "Commander Riker", "Lieutenant Security-Officer", "Lt. Cmdr. Worf", ]
     */
+    if (this.rightReport) {
+      officerNames = this.rightReport.listOfficersByExperience(officerNames);
+    }
+
+    officerNames.push(this.officerName);
+
+    if (this.leftReport) {
+      officerNames = this.leftReport.listOfficersByExperience(officerNames);
+    }
+
     return officerNames;
   }
+
 
   listOfficersByRank(tree, rankedOfficers = {}) {
     /*
@@ -74,6 +98,32 @@ class StarshipEnterprise {
     Your method should return an object where each property represents the numerical rank and
     each value consists of an array of officers (in any experience order) of a particular rank.
     */
+    const queue = new Queue();
+    queue.enqueue(tree);
+    let node = queue.dequeue();
+    let rank = 1;
+
+    while (node) {
+      if (rankedOfficers[rank]) {
+        if (rankedOfficers[rank].includes(node.reportTo.officerName)) {
+          rank++;
+          rankedOfficers[rank] = [node.officerName];
+        }
+        else
+          rankedOfficers[rank].push(node.officerName)
+      }
+      else {
+        rankedOfficers[rank] = [node.officerName];
+      }
+      if (node.leftReport) {
+        queue.enqueue(node.leftReport);
+      }
+      if (node.rightReport) {
+        queue.enqueue(node.rightReport);
+      }
+      node = queue.dequeue();
+    }
+
     return rankedOfficers;
   }
 }
