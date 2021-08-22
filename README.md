@@ -46,6 +46,3 @@ In src/StarshipEnterpriseOfficer.js, complete the following methods:
   3: [ 'Lt. Cmdr. Worf', 'Lt. Cmdr. LaForge', 'Lt. Cmdr. Crusher' ],
   4: [ 'Lieutenant Security-Officer', 'Lieutenant Selar' ]
 }
-
-
-Once these tasks are complete, all tests should pass.
